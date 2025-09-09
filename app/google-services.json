@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "864043909251",
+    "project_id": "appps-65836",
+    "storage_bucket": "appps-65836.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864043909251:android:1692e319ef36deea1e1bb6",
+        "android_client_info": {
+          "package_name": "com.example.app_gps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnf8YbpQCYV2rqHh-VECWS2C0YmN69Hmc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

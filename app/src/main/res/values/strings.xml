@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">App_GPS</string>
+    <string name="hint_plate_number">Nhập biển số xe</string>
+    <string name="save_plate">Lưu</string>
+</resources>
