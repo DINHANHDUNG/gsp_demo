@@ -4,10 +4,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.Manifest
+import android.content.ComponentName
+import android.net.Uri
+import android.os.Build
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import android.provider.Settings
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         checkAndRequestPermission()
+        // Gọi hàm để hiển thị hộp thoại
+        showAutoStartDialog()
 
         // Kiểm tra và xử lý biển số xe từ SharedPreferences
         val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
@@ -56,6 +63,34 @@ class MainActivity : AppCompatActivity() {
         serviceIntent.putExtra("plate_number",plateNumber)
 //        startService(serviceIntent)
         ContextCompat.startForegroundService(this, serviceIntent)
+    }
+
+    fun showAutoStartDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Cần bật tính năng tự khởi chạy")
+            .setMessage("Để ứng dụng hoạt động ổn định khi khởi động lại, vui lòng bật 'Tự khởi chạy' cho ứng dụng trong phần Cài đặt.")
+            .setPositiveButton("Đi đến Cài đặt") { _, _ ->
+                // Khởi chạy màn hình cài đặt tự khởi động (tùy thuộc vào nhà sản xuất)
+                val intent = Intent()
+                val manufacturer = Build.MANUFACTURER
+                if ("xiaomi".equals(manufacturer, ignoreCase = true)) {
+                    intent.component = ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")
+                } else if ("huawei".equals(manufacturer, ignoreCase = true) || "honor".equals(manufacturer, ignoreCase = true)) {
+                    intent.component = ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")
+                }
+                // Bạn có thể thêm các nhà sản xuất khác ở đây
+
+                try {
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    // Trường hợp Intent thất bại, chuyển đến màn hình thông tin ứng dụng chung
+                    val appInfoIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    appInfoIntent.data = Uri.fromParts("package", packageName, null)
+                    startActivity(appInfoIntent)
+                }
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
     }
 
     override fun onRequestPermissionsResult(
