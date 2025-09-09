@@ -11,7 +11,7 @@ import androidx.core.app.ActivityCompat
 class MainActivity : AppCompatActivity() {
 
     private val LOCATION_PERMISSION_REQUEST = 100
-
+    var plateNumber = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -20,9 +20,8 @@ class MainActivity : AppCompatActivity() {
 
         // Kiểm tra và xử lý biển số xe từ SharedPreferences
         val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-        val plateNumber = prefs.getString("plate_number", null)
-
-        if (plateNumber.isNullOrEmpty()) {
+        plateNumber = prefs.getString("plate_number", null) ?: ""
+        if (plateNumber.isEmpty()) {
             // Nếu chưa có biển số xe, mở activity nhập biển số
             val intent = Intent(this, PlateNumberActivity::class.java)
             startActivity(intent)
@@ -53,6 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startLocationService() {
         val serviceIntent = Intent(this, LocationService::class.java)
+        serviceIntent.putExtra("plate_number",plateNumber)
         startService(serviceIntent)
     }
 

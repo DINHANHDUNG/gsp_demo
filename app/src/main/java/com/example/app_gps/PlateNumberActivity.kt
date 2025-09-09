@@ -32,6 +32,7 @@ class PlateNumberActivity : AppCompatActivity() {
 
                 // Chuyển về MainActivity
                 val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("plate_number",plateNumber)
                 startActivity(intent)
                 finish()
             } else {

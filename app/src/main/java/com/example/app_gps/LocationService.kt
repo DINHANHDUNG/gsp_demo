@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
@@ -15,7 +16,7 @@ class LocationService : Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
-
+    var plateNumber = ""
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -30,10 +31,13 @@ class LocationService : Service() {
 
                     // Gửi lên Firebase
                     val carPlate = "29A-12345" // TODO: lấy từ SharedPreferences
-                    val data = mapOf("lat" to lat, "lng" to lng, "time" to System.currentTimeMillis())
+                    val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                    plateNumber = prefs.getString("plate_number", null) ?: ""
+
+                    val data = mapOf("lat" to lat, "lng" to lng, "car_plate" to plateNumber, "time" to System.currentTimeMillis())
                     FirebaseDatabase.getInstance().reference
                         .child("vehicles")
-                        .child(carPlate)
+                        .child(getIdDevice())
                         .setValue(data)
                 }
             }
@@ -45,7 +49,7 @@ class LocationService : Service() {
     private fun requestLocationUpdates() {
         val request = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
-            60_000L // 60 giây = 1 phút
+            1000 // 60 giây = 1 phút
         ).build()
 
         if (ActivityCompat.checkSelfPermission(
@@ -69,4 +73,8 @@ class LocationService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun getIdDevice() : String{
+        return Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
+    }
 }
