@@ -1,10 +1,13 @@
 package com.example.app_gps
 
+import android.Manifest
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.firebase.database.FirebaseDatabase
 
