@@ -7,6 +7,7 @@ import android.Manifest
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,7 +54,8 @@ class MainActivity : AppCompatActivity() {
     private fun startLocationService() {
         val serviceIntent = Intent(this, LocationService::class.java)
         serviceIntent.putExtra("plate_number",plateNumber)
-        startService(serviceIntent)
+//        startService(serviceIntent)
+        ContextCompat.startForegroundService(this, serviceIntent)
     }
 
     override fun onRequestPermissionsResult(
