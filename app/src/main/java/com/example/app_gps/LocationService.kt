@@ -45,6 +45,19 @@ class LocationService : Service() {
             60_000L // 60 giây = 1 phút
         ).build()
 
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Không có quyền → dừng, tránh crash
+            return
+        }
+
         fusedLocationClient.requestLocationUpdates(
             request,
             locationCallback,

@@ -1,29 +1,75 @@
 package com.example.app_gps
 
 import android.content.Intent
-import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.Manifest
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity() {
 
+    private val LOCATION_PERMISSION_REQUEST = 100
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        // kiểm tra xem có lưu biển số xe chưa
-        val prefs: SharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        checkAndRequestPermission()
+
+        // Kiểm tra và xử lý biển số xe từ SharedPreferences
+        val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
         val plateNumber = prefs.getString("plate_number", null)
 
         if (plateNumber.isNullOrEmpty()) {
-            // nếu chưa có thì mở PlateNumberActivity để nhập
+            // Nếu chưa có biển số xe, mở activity nhập biển số
             val intent = Intent(this, PlateNumberActivity::class.java)
             startActivity(intent)
-            finish() // đóng MainActivity để tránh quay ngược lại
+            finish() // Đóng MainActivity để tránh quay lại
         } else {
-            // nếu đã có thì load layout chính (ví dụ activity_main.xml)
-            setContentView(R.layout.activity_main)
+            // Nếu có biển số xe, thực hiện phần chính của ứng dụng (ví dụ: GPS, Map)
+            // TODO: Ở đây bạn có thể đặt các tính năng như GPS, bản đồ
+        }
+    }
 
-            // TODO: ở đây bạn code phần chính của app (map, GPS, vv...)
+    private fun checkAndRequestPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Yêu cầu quyền truy cập vị trí
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST
+            )
+        } else {
+            // Nếu quyền đã được cấp, khởi động dịch vụ vị trí
+            startLocationService()
+        }
+    }
+
+    private fun startLocationService() {
+        val serviceIntent = Intent(this, LocationService::class.java)
+        startService(serviceIntent)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Nếu quyền được cấp, khởi động dịch vụ vị trí
+                startLocationService()
+            } else {
+                // Nếu quyền bị từ chối, thông báo yêu cầu quyền
+                Toast.makeText(this, "Bạn cần cấp quyền GPS để tiếp tục", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
